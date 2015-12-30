@@ -1,0 +1,37 @@
+{
+  "name": "overpass-wizard",
+  "version": "0.0.0",
+  "description": "Generates Overpass-API queries.",
+  "main": "index.js",
+  "scripts": {
+    "pretest": "npm ls --depth=Infinity > /dev/null",
+    "test": "npm run test-lib && npm run test-cli",
+    "test-lib": "mocha -R spec",
+    "test-cli": "node test-cli/cli.test.js | faucet"
+  },
+  "bin": {
+    "overpass-wizard": "overpass-wizard"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tyrasd/overpass-wizard.git"
+  },
+  "keywords": [
+    "openstreetmap",
+    "Overpass API",
+    "geojson"
+  ],
+  "author": "Martin Raifer",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tyrasd/overpass-wizard/issues"
+  },
+  "dependencies": {
+    "optimist": "^0.6.1"
+  },
+  "devDependencies": {
+    "expect.js": "^0.3.1",
+    "mocha": "^2.3.4",
+    "pegjs": "^0.9.0"
+  }
+}

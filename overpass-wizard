@@ -1,0 +1,23 @@
+#!/usr/bin/env node
+
+var opt = require('optimist')
+        .usage('Usage: $0 search')
+        .boolean('version').describe('version','display software version')
+        .boolean('help').describe('help','print this help message'),
+    argv = opt.argv;
+
+if (argv.help) {
+    return opt.showHelp();
+}
+if (argv.version) {
+    return process.stdout.write(require('./package.json').version+'\n');
+}
+
+var search = argv._.join(" ");
+
+// wizard module
+var wizard = require(".");
+
+// todo: implement shortcut-expansion
+
+console.log(wizard.construct_query(search));
