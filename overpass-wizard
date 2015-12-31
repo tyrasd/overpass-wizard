@@ -2,6 +2,7 @@
 
 var opt = require('optimist')
         .usage('Usage: $0 SEARCH')
+        .string('bbox').describe('bbox','string to replace {{bbox}} shortcuts with')
         .boolean('version').describe('version','display software version')
         .boolean('help').describe('help','print this help message'),
     argv = opt.argv,
@@ -18,7 +19,7 @@ if (argv.version) {
 var search = argv._.join(" ");
 
 if (search.length === 0) {
-  // read query from stdin
+  // read query from stdin instead
   process.stdin.pipe(concat(generateAndPrintQuery));
 } else {
   generateAndPrintQuery(search);
@@ -27,6 +28,9 @@ if (search.length === 0) {
 
 function generateAndPrintQuery(search) {
   if (typeof search !== "string") search = search.toString().trim();
-  // todo: implement shortcut-expansion
-  process.stdout.write(wizard.construct_query(search));
+  var overpassQuery = wizard.construct_query(search);
+  // todo: replace with something more soffisticated, see js/query.js in overpass-turbo
+  if (argv.bbox) overpassQuery = overpassQuery.replace(/{{bbox}}/g, argv.bbox);
+  // todo: implement more shortcut-expansions
+  process.stdout.write(overpassQuery);
 }
