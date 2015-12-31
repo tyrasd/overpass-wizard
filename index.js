@@ -1,6 +1,10 @@
 var parser = require("./parser.js");
 var wizard = {};
-var freeFormQuery;
+var freeFormQuery; // todo: refactor this!
+
+// todo: normalization -> node module?
+// todo: add options: output mode, inline verbosity, (de)active features (ffs, in X, etc.) …
+// todo: refactor ffs->parsedQuery?
 
 /* this converts a random boolean expression into a normalized form:
  * A∧B∧… ∨ C∧D∧… ∨ …
