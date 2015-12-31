@@ -27,6 +27,7 @@
     "url": "https://github.com/tyrasd/overpass-wizard/issues"
   },
   "dependencies": {
+    "concat-stream": "~1.0.1",
     "optimist": "^0.6.1"
   },
   "devDependencies": {
