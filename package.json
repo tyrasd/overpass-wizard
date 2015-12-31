@@ -5,9 +5,8 @@
   "main": "index.js",
   "scripts": {
     "pretest": "npm ls --depth=Infinity > /dev/null",
-    "test": "npm run test-lib && npm run test-cli",
-    "test-lib": "mocha -R spec",
-    "test-cli": "node test-cli/cli.test.js | faucet"
+    "test": "npm run test-lib",
+    "test-lib": "mocha -R spec"
   },
   "bin": {
     "overpass-wizard": "overpass-wizard"
