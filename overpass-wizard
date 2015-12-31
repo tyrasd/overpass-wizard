@@ -29,6 +29,9 @@ if (search.length === 0) {
 function generateAndPrintQuery(search) {
   if (typeof search !== "string") search = search.toString().trim();
   var overpassQuery = wizard.construct_query(search);
+  if (overpassQuery === false) {
+    return process.exit(1);
+  }
   // todo: replace with something more soffisticated, see js/query.js in overpass-turbo
   if (argv.bbox) overpassQuery = overpassQuery.replace(/{{bbox}}/g, argv.bbox);
   // todo: implement more shortcut-expansions, e.g. geocoded expansion (use nominatim via request?)

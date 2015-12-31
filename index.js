@@ -4,7 +4,6 @@ var freeFormQuery; // todo: refactor this!
 
 // todo: normalization -> node module?
 // todo: add options: output mode, inline verbosity, (de)active features (ffs, in X, etc.), global [bbox:…] in output, timeouts, output format, …
-// todo: refactor ffs->parsedQuery?
 
 /* this converts a random boolean expression into a normalized form:
  * A∧B∧… ∨ C∧D∧… ∨ …
@@ -58,12 +57,12 @@ wizard.construct_query = function(search, comment) {
     return s.replace(/\*\//g,'[…]').replace(/\n/g,'\\n');
   }
 
-  var ffs;
+  var parsedQuery;
 
   try {
-    ffs = parser.parse(search);
+    parsedQuery = parser.parse(search);
   } catch(e) {
-    console.log("ffs parse error");
+    console.error("couldn't parse wizard input");
     return false;
   }
 
@@ -81,16 +80,16 @@ wizard.construct_query = function(search, comment) {
   query_parts.push('*/');
   query_parts.push('[out:json][timeout:25];');
 
-  switch(ffs.bounds) {
+  switch(parsedQuery.bounds) {
     case "area":
-      query_parts.push('// fetch area “'+ffs.area+'” to search in');
-      query_parts.push('{{geocodeArea:'+ffs.area+'}}->.searchArea;');
+      query_parts.push('// fetch area “'+parsedQuery.area+'” to search in');
+      query_parts.push('{{geocodeArea:'+parsedQuery.area+'}}->.searchArea;');
       bounds_part = '(area.searchArea)';
     break;
     case "around":
       query_parts.push('// adjust the search radius (in meters) here');
       query_parts.push('{{radius=1000}}');
-      bounds_part = '(around:{{radius}},{{geocodeCoords:'+ffs.area+'}})';
+      bounds_part = '(around:{{radius}},{{geocodeCoords:'+parsedQuery.area+'}})';
     break;
     case "bbox":
       bounds_part = '({{bbox}})';
@@ -99,7 +98,7 @@ wizard.construct_query = function(search, comment) {
       bounds_part = undefined;
     break;
     default:
-      alert("unknown bounds condition: "+ffs.bounds);
+      alert("unknown bounds condition: "+parsedQuery.bounds);
       return false;
     break;
   }
@@ -180,13 +179,13 @@ wizard.construct_query = function(search, comment) {
           case "uid":
             return '(uid:'+val+')';
           default:
-            console.log("unknown query type: meta/"+condition.meta);
+            console.error("unknown query type: meta/"+condition.meta);
             return false;
         }
       case "free form":
         // own module, special cased below
       default:
-        console.log("unknown query type: "+condition.query);
+        console.error("unknown query type: "+condition.query);
         return false;
     }
   }
@@ -238,12 +237,12 @@ wizard.construct_query = function(search, comment) {
     }
   }
 
-  ffs.query = normalize(ffs.query);
+  parsedQuery.query = normalize(parsedQuery.query);
 
   query_parts.push('// gather results');
   query_parts.push('(');
-  for (var i=0; i<ffs.query.queries.length; i++) {
-    var and_query = ffs.query.queries[i];
+  for (var i=0; i<parsedQuery.query.queries.length; i++) {
+    var and_query = parsedQuery.query.queries[i];
 
     var types = ['node','way','relation'];
     var clauses = [];
@@ -303,10 +302,10 @@ wizard.construct_query = function(search, comment) {
 
 // this is a "did you mean …" mechanism against typos in preset names
 wizard.repair_search = function(search) {
-  var ffs;
+  var parsedQuery;
 
   try {
-    ffs = parser.parse(search);
+    parsedQuery = parser.parse(search);
   } catch(e) {
     return false;
   }
@@ -320,8 +319,8 @@ wizard.repair_search = function(search) {
   var search_parts = [];
   var repaired = false;
 
-  ffs.query = normalize(ffs.query);
-  ffs.query.queries.forEach(function (q) {
+  parsedQuery.query = normalize(parsedQuery.query);
+  parsedQuery.query.queries.forEach(function (q) {
     q.queries.forEach(validateQuery);
   });
   function validateQuery(cond_query) {
