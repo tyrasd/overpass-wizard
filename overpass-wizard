@@ -31,6 +31,6 @@ function generateAndPrintQuery(search) {
   var overpassQuery = wizard.construct_query(search);
   // todo: replace with something more soffisticated, see js/query.js in overpass-turbo
   if (argv.bbox) overpassQuery = overpassQuery.replace(/{{bbox}}/g, argv.bbox);
-  // todo: implement more shortcut-expansions
+  // todo: implement more shortcut-expansions, e.g. geocoded expansion (use nominatim via request?)
   process.stdout.write(overpassQuery);
 }

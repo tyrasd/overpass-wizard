@@ -3,7 +3,7 @@ var wizard = {};
 var freeFormQuery; // todo: refactor this!
 
 // todo: normalization -> node module?
-// todo: add options: output mode, inline verbosity, (de)active features (ffs, in X, etc.) …
+// todo: add options: output mode, inline verbosity, (de)active features (ffs, in X, etc.), global [bbox:…] in output, timeouts, output format, …
 // todo: refactor ffs->parsedQuery?
 
 /* this converts a random boolean expression into a normalized form:
