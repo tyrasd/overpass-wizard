@@ -276,6 +276,8 @@ module.exports = function wizard(search, options) {
       var cond_query = and_query.queries[j];
       // todo: looks like some code duplication here could be reduced by refactoring
       if (cond_query.query === "free form") {
+        console.error("not yet implemented")
+        return
         // eventually load free form query module
         if (!freeFormQuery) freeFormQuery = turbo.ffs.free();
         var ffs_clause = freeFormQuery.get_query_clause(cond_query);
