@@ -22,7 +22,6 @@ var argv = require('yargs')
 
     fs = require('fs'),
     concat = require('concat-stream'),
-    Promise = require('promise'),
     expand = require('./expand'),
     wizard = require('.');
 
@@ -58,11 +57,9 @@ function generateAndPrintQuery(search) {
   overpassQuery += "\n";
   if (argv.expand !== false) {
     // expand shortcuts
-    expand(overpassQuery, argv.bbox)
-    .then(function(overpassQuery) {
+    expand(overpassQuery, argv.bbox, function(err, overpassQuery) {
+      if (err) return console.error(err);
       process.stdout.write(overpassQuery);
-    }).catch(function(err) {
-      console.error(err);
     });
   } else {
     process.stdout.write(overpassQuery);

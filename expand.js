@@ -84,7 +84,7 @@ var expansions = {
   geocodeCoords: geocodeCoords
 };
 
-module.exports = function(overpassQuery, bbox) {
+module.exports = function(overpassQuery, bbox, callback) {
   // 1. bbox
   if (bbox) overpassQuery = overpassQuery.replace(/{{bbox}}/g, bbox);
   // 2. constants
@@ -109,5 +109,9 @@ module.exports = function(overpassQuery, bbox) {
       overpassQuery = overpassQuery.replace(shortcuts[index], expansion);
     });
     return overpassQuery;
+  }).then(function(overpassQuery) {
+    callback(undefined, overpassQuery)
+  }).catch(function(err) {
+    callback(err);
   });
 };
