@@ -1,5 +1,4 @@
 var parser = require("./parser.js");
-var wizard = {};
 var freeFormQuery; // todo: refactor this!
 
 // todo: normalization -> node module?
@@ -45,7 +44,7 @@ function normalize(query) {
   return normalized_query;
 }
 
-wizard.construct_query = function(search, options) {
+module.exports = function wizard(search, options) {
   var defaults = {
     comment: true,
     outputMode: "recursive", // "recursive", "geom", "ids", "…" (out *)
@@ -54,10 +53,10 @@ wizard.construct_query = function(search, options) {
     //todo: more fine grained controll, e.g. to deactivate "in X"
     timeout: 25,
     //memory: undefined, // todo: rename
-    outputFormat: "json" // "json", "xml"
-    //around_radius: 1000
+    outputFormat: "json", // "json", "xml"
+    aroundRadius: 1000
   }
-  // todo: docu ment options
+  // todo: document options
   // todo: re-tweak defaults (e.g. globalBbox->true, outputMode->geom)
 
   for (var k in options) {
@@ -111,7 +110,7 @@ wizard.construct_query = function(search, options) {
     case "around":
       if (options.comment)
         query_parts.push('// adjust the search radius (in meters) here');
-      query_parts.push('{{radius=1000}}');
+      query_parts.push('{{radius='+options.aroundRadius+'}}');
       bounds_part = '(around:{{radius}},{{geocodeCoords:'+parsedQuery.area+'}})';
     break;
     case "bbox":
@@ -334,61 +333,3 @@ wizard.construct_query = function(search, options) {
 
   return query_parts.join('\n');
 }
-
-// this is a "did you mean …" mechanism against typos in preset names
-wizard.repair_search = function(search) {
-  var parsedQuery;
-
-  try {
-    parsedQuery = parser.parse(search);
-  } catch(e) {
-    return false;
-  }
-
-  function quotes(s) {
-    if (s.match(/^[a-zA-Z0-9_]+$/) === null)
-      return '"'+s.replace(/"/g,'\\"')+'"';
-    return s;
-  }
-
-  var search_parts = [];
-  var repaired = false;
-
-  parsedQuery.query = normalize(parsedQuery.query);
-  parsedQuery.query.queries.forEach(function (q) {
-    q.queries.forEach(validateQuery);
-  });
-  function validateQuery(cond_query) {
-    if (cond_query.query === "free form") {
-      // eventually load free form query module
-      /* TODO :turbo.ffs.free!!! */
-      if (!freeFormQuery) freeFormQuery = turbo.ffs.free();
-      /* TODO :turbo.ffs.free!!! */
-      var ffs_clause = freeFormQuery.get_query_clause(cond_query);
-      if (ffs_clause === false) {
-        // try to find suggestions for occasional typos
-        var fuzzy = freeFormQuery.fuzzy_search(cond_query);
-        var free_regex = null;
-        try { free_regex = new RegExp("['\"]?"+RTRegexp(cond_query.free)+"['\"]?"); } catch(e) {}
-        if (fuzzy && search.match(free_regex)) {
-          search_parts = search_parts.concat(search.split(free_regex));
-          search = search_parts.pop();
-          var replacement = quotes(fuzzy);
-          search_parts.push(replacement);
-          repaired = true;
-        }
-      }
-    }
-  }
-  search_parts.push(search);
-
-  if (!repaired)
-    return false;
-  return search_parts;
-}
-
-wizard.invalidateCache = function() {
-  freeFormQuery = undefined;
-}
-
-module.exports = wizard;

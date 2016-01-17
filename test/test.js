@@ -20,7 +20,7 @@ describe("basic conditions", function () {
   // key
   it("key=*", function () {
     var search = "foo=*";
-    var result = wizard.construct_query(search);
+    var result = wizard(search);
     expect(compact(result)).to.equal(
       "("+
         "node[\"foo\"](bbox);"+
@@ -33,7 +33,7 @@ describe("basic conditions", function () {
   // not key
   it("key!=*", function () {
     var search = "foo!=*";
-    var result = wizard.construct_query(search);
+    var result = wizard(search);
     expect(compact(result)).to.equal(
       "("+
         "node[\"foo\"!~\".*\"](bbox);"+
@@ -46,7 +46,7 @@ describe("basic conditions", function () {
   // key-value
   it("key=value", function () {
     var search = "foo=bar";
-    var result = wizard.construct_query(search);
+    var result = wizard(search);
     expect(compact(result)).to.equal(
       "("+
         "node[\"foo\"=\"bar\"](bbox);"+
@@ -59,7 +59,7 @@ describe("basic conditions", function () {
   // not key-value
   it("key!=value", function () {
     var search = "foo!=bar";
-    var result = wizard.construct_query(search);
+    var result = wizard(search);
     expect(compact(result)).to.equal(
       "("+
         "node[\"foo\"!=\"bar\"](bbox);"+
@@ -72,7 +72,7 @@ describe("basic conditions", function () {
   // regex key-value
   it("key~value", function () {
     var search = "foo~bar";
-    var result = wizard.construct_query(search);
+    var result = wizard(search);
     expect(compact(result)).to.equal(
       "("+
         "node[\"foo\"~\"bar\"](bbox);"+
@@ -85,7 +85,7 @@ describe("basic conditions", function () {
   // regex key
   it("~key~value", function () {
     var search = "~foo~bar";
-    var result = wizard.construct_query(search);
+    var result = wizard(search);
     expect(compact(result)).to.equal(
       "("+
         "node[~\"foo\"~\"bar\"](bbox);"+
@@ -98,7 +98,7 @@ describe("basic conditions", function () {
   // not regex key-value
   it("key!~value", function () {
     var search = "foo!~bar";
-    var result = wizard.construct_query(search);
+    var result = wizard(search);
     expect(compact(result)).to.equal(
       "("+
         "node[\"foo\"!~\"bar\"](bbox);"+
@@ -112,7 +112,7 @@ describe("basic conditions", function () {
   it("key:value", function () {
     // normal case: just do a regex search
     var search = "foo:bar";
-    var result = wizard.construct_query(search);
+    var result = wizard(search);
     expect(compact(result)).to.equal(
       "("+
         "node[\"foo\"~\"bar\"](bbox);"+
@@ -123,7 +123,7 @@ describe("basic conditions", function () {
     );
     // but also escape special characters
     search = "foo:'*'";
-    result = wizard.construct_query(search);
+    result = wizard(search);
     expect(compact(result)).to.equal(
       "("+
         "node[\"foo\"~\"\\\\*\"](bbox);"+
@@ -143,7 +143,7 @@ describe("data types", function () {
       var search, result;
       // double-quoted string
       search = '"a key"="a value"';
-      result = wizard.construct_query(search);
+      result = wizard(search);
       expect(compact(result)).to.equal(
         '('+
           'node["a key"="a value"](bbox);'+
@@ -157,7 +157,7 @@ describe("data types", function () {
       var search, result;
       // single-quoted string
       search = "'foo bar'='asd fasd'";
-      result = wizard.construct_query(search);
+      result = wizard(search);
       expect(compact(result)).to.equal(
         '('+
           'node["foo bar"="asd fasd"](bbox);'+
@@ -169,7 +169,7 @@ describe("data types", function () {
     });
     it("quoted unicode string", function () {
       var search = "name='بیجنگ'";
-      var result = wizard.construct_query(search);
+      var result = wizard(search);
       expect(compact(result)).to.equal(
         '('+
           'node["name"="بیجنگ"](bbox);'+
@@ -181,7 +181,7 @@ describe("data types", function () {
     });
     it("unicode string", function () {
       var search = "name=Béziers";
-      var result = wizard.construct_query(search);
+      var result = wizard(search);
       expect(compact(result)).to.equal(
         '('+
           'node["name"="Béziers"](bbox);'+
@@ -197,7 +197,7 @@ describe("data types", function () {
     var search, result;
     // simple regex
     search = "foo~/bar/";
-    result = wizard.construct_query(search);
+    result = wizard(search);
     expect(compact(result)).to.equal(
       "("+
         "node[\"foo\"~\"bar\"](bbox);"+
@@ -208,7 +208,7 @@ describe("data types", function () {
     );
     // simple regex with modifier
     search = "foo~/bar/i";
-    result = wizard.construct_query(search);
+    result = wizard(search);
     expect(compact(result)).to.equal(
       "("+
         "node[\"foo\"~\"bar\",i](bbox);"+
@@ -225,7 +225,7 @@ describe("boolean logic", function () {
   // logical and
   it("logical and", function () {
     var search = "foo=bar and asd=fasd";
-    var result = wizard.construct_query(search);
+    var result = wizard(search);
     expect(compact(result)).to.equal(
       "("+
         "node[\"foo\"=\"bar\"][\"asd\"=\"fasd\"](bbox);"+
@@ -237,7 +237,7 @@ describe("boolean logic", function () {
   });
   it("logical and (& operator)", function () {
     var search = "foo=bar & asd=fasd";
-    var result = wizard.construct_query(search);
+    var result = wizard(search);
     expect(compact(result)).to.equal(
       '('+
         'node["foo"="bar"]["asd"="fasd"](bbox);'+
@@ -249,7 +249,7 @@ describe("boolean logic", function () {
   });
   it("logical and (&& operator)", function () {
     var search = "foo=bar && asd=fasd";
-    var result = wizard.construct_query(search);
+    var result = wizard(search);
     expect(compact(result)).to.equal(
       '('+
         'node["foo"="bar"]["asd"="fasd"](bbox);'+
@@ -262,7 +262,7 @@ describe("boolean logic", function () {
   // logical or
   it("logical or", function () {
     var search = "foo=bar or asd=fasd";
-    var result = wizard.construct_query(search);
+    var result = wizard(search);
     expect(compact(result)).to.equal(
       "("+
         "node[\"foo\"=\"bar\"](bbox);"+
@@ -277,7 +277,7 @@ describe("boolean logic", function () {
   });
   it("logical or (| operator)", function () {
     var search = "foo=bar | asd=fasd";
-    var result = wizard.construct_query(search);
+    var result = wizard(search);
     expect(compact(result)).to.equal(
       '('+
         'node["foo"="bar"](bbox);'+
@@ -292,7 +292,7 @@ describe("boolean logic", function () {
   });
   it("logical or (|| operator)", function () {
     var search = "foo=bar || asd=fasd";
-    var result = wizard.construct_query(search);
+    var result = wizard(search);
     expect(compact(result)).to.equal(
       '('+
         'node["foo"="bar"](bbox);'+
@@ -308,7 +308,7 @@ describe("boolean logic", function () {
   // boolean expression
   it("boolean expression", function () {
     var search = "(foo=* or bar=*) and (asd=* or fasd=*)";
-    var result = wizard.construct_query(search);
+    var result = wizard(search);
     expect(compact(result)).to.equal(
       "("+
         "node[\"foo\"][\"asd\"](bbox);"+
@@ -335,7 +335,7 @@ describe("meta conditions", function () {
   it("type", function () {
     // simple
     var search = "foo=bar and type:node";
-    var result = wizard.construct_query(search);
+    var result = wizard(search);
     expect(compact(result)).to.equal(
       "("+
         "node[\"foo\"=\"bar\"](bbox);"+
@@ -344,7 +344,7 @@ describe("meta conditions", function () {
     );
     // multiple types
     search = "foo=bar and (type:node or type:way)";
-    result = wizard.construct_query(search);
+    result = wizard(search);
     expect(compact(result)).to.equal(
       "("+
         "node[\"foo\"=\"bar\"](bbox);"+
@@ -354,7 +354,7 @@ describe("meta conditions", function () {
     );
     // excluding types
     search = "foo=bar and type:node and type:way";
-    result = wizard.construct_query(search);
+    result = wizard(search);
     expect(compact(result)).to.equal(
       "("+
       ");"+
@@ -365,7 +365,7 @@ describe("meta conditions", function () {
   it("newer", function () {
     // regular
     var search = "newer:\"2000-01-01T01:01:01Z\" and type:node";
-    var result = wizard.construct_query(search);
+    var result = wizard(search);
     expect(compact(result)).to.equal(
       "("+
         "node(newer:\"2000-01-01T01:01:01Z\")(bbox);"+
@@ -374,7 +374,7 @@ describe("meta conditions", function () {
     );
     // relative
     search = "newer:1day and type:node";
-    result = wizard.construct_query(search);
+    result = wizard(search);
     expect(compact(result)).to.equal(
       "("+
         "node(newer:\"date:1day\")(bbox);"+
@@ -386,7 +386,7 @@ describe("meta conditions", function () {
   it("user", function () {
     // user name
     var search = "user:foo and type:node";
-    var result = wizard.construct_query(search);
+    var result = wizard(search);
     expect(compact(result)).to.equal(
       "("+
         "node(user:\"foo\")(bbox);"+
@@ -395,7 +395,7 @@ describe("meta conditions", function () {
     );
     // uid
     search = "uid:123 and type:node";
-    result = wizard.construct_query(search);
+    result = wizard(search);
     expect(compact(result)).to.equal(
       "("+
         "node(uid:123)(bbox);"+
@@ -407,7 +407,7 @@ describe("meta conditions", function () {
   it("id", function () {
     // with type
     var search = "id:123 and type:node";
-    var result = wizard.construct_query(search);
+    var result = wizard(search);
     expect(compact(result)).to.equal(
       "("+
         "node(123)(bbox);"+
@@ -416,7 +416,7 @@ describe("meta conditions", function () {
     );
     // without type
     search = "id:123";
-    result = wizard.construct_query(search);
+    result = wizard(search);
     expect(compact(result)).to.equal(
       "("+
         "node(123)(bbox);"+
@@ -433,7 +433,7 @@ describe("regions", function () {
   // global
   it("global", function () {
     var search = "foo=bar and type:node global";
-    var result = wizard.construct_query(search);
+    var result = wizard(search);
     expect(compact(result)).to.equal(
       "("+
         "node[\"foo\"=\"bar\"];"+
@@ -445,7 +445,7 @@ describe("regions", function () {
   it("in bbox", function () {
     // implicit
     var search = "type:node";
-    var result = wizard.construct_query(search);
+    var result = wizard(search);
     expect(compact(result)).to.equal(
       "("+
         "node(bbox);"+
@@ -454,7 +454,7 @@ describe("regions", function () {
     );
     // explicit
     search = "type:node in bbox";
-    result = wizard.construct_query(search);
+    result = wizard(search);
     expect(compact(result)).to.equal(
       "("+
         "node(bbox);"+
@@ -465,7 +465,7 @@ describe("regions", function () {
   // area
   it("in area", function () {
     var search = "type:node in foobar";
-    var result = wizard.construct_query(search);
+    var result = wizard(search);
     expect(compact(result)).to.equal(
       "area(foobar)->.searchArea;"+
       "("+
@@ -477,7 +477,7 @@ describe("regions", function () {
   // around
   it("around", function () {
     var search = "type:node around foobar";
-    var result = wizard.construct_query(search);
+    var result = wizard(search);
     expect(compact(result)).to.equal(
       "("+
         "node(around:,coords:foobar);"+
@@ -532,11 +532,11 @@ describe("free form", function () {
     var search, result;
     // preset not found
     search = "foo";
-    result = wizard.construct_query(search);
+    result = wizard(search);
     expect(result).to.equal(false);
     // preset (points, key-value)
     search = "Shelter";
-    result = wizard.construct_query(search);
+    result = wizard(search);
     expect(result).to.not.equal(false);
     expect(compact(result)).to.equal(
       "("+
@@ -546,7 +546,7 @@ describe("free form", function () {
     );
     // preset (points, areas, key-value)
     search = "Hospital";
-    result = wizard.construct_query(search);
+    result = wizard(search);
     expect(result).to.not.equal(false);
     expect(compact(result)).to.equal(
       "("+
@@ -558,7 +558,7 @@ describe("free form", function () {
     );
     // preset (lines, key=*)
     search = "Highway";
-    result = wizard.construct_query(search);
+    result = wizard(search);
     expect(result).to.not.equal(false);
     expect(compact(result)).to.equal(
       "("+
@@ -576,7 +576,7 @@ describe("special cases", function () {
   // empty value
   it("empty value", function () {
     var search = "foo='' and type:way";
-    var result = wizard.construct_query(search);
+    var result = wizard(search);
     expect(compact(result)).to.equal(
       "("+
         "way[\"foo\"~\"^$\"](bbox);"+
@@ -587,7 +587,7 @@ describe("special cases", function () {
   // empty key
   it("empty key", function () {
     var search = "''=bar and type:way";
-    var result = wizard.construct_query(search);
+    var result = wizard(search);
     expect(compact(result)).to.equal(
       "("+
         "way[~\"^$\"~\"^bar$\"](bbox);"+
@@ -596,7 +596,7 @@ describe("special cases", function () {
     );
     // make sure stuff in the value section gets escaped properly
     search = "''='*' and type:way";
-    result = wizard.construct_query(search);
+    result = wizard(search);
     expect(compact(result)).to.equal(
       "("+
         "way[~\"^$\"~\"^\\\\*$\"](bbox);"+
@@ -605,7 +605,7 @@ describe("special cases", function () {
     );
     // does also work for =*, ~ and : searches
     search = "(''=* or ''~/.../) and type:way";
-    result = wizard.construct_query(search);
+    result = wizard(search);
     expect(compact(result)).to.equal(
       "("+
         "way[~\"^$\"~\".*\"](bbox);"+
@@ -617,7 +617,7 @@ describe("special cases", function () {
   // newlines, tabs
   it("newlines, tabs", function () {
     var search = "(foo='\t' or foo='\n' or asd='\\t') and type:way";
-    var result = wizard.construct_query(search);
+    var result = wizard(search);
     expect(compact(result)).to.equal(
       "("+
         "way[\"foo\"=\"\\t\"](bbox);"+

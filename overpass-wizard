@@ -31,13 +31,26 @@ if (search.length === 0) {
 
 function generateAndPrintQuery(search) {
   if (typeof search !== 'string') search = search.toString().trim();
-  var overpassQuery = wizard.construct_query(search);
+  var overpassQuery = wizard(search);
   if (overpassQuery === false) {
     return process.exit(1);
   }
   if (argv.expand !== false) {
     // expand shortcuts
+    // 1. bbox
     if (argv.bbox) overpassQuery = overpassQuery.replace(/{{bbox}}/g, argv.bbox);
+    // 2. constants
+    var constantRegexp = "{{([a-zA-Z0-9_]+)=(.+?)}}";
+    var constants = overpassQuery.match(new RegExp(constantRegexp, 'g')) || [];
+    constants.forEach(function(constant) {
+      var constantDefinition = constant.match(new RegExp(constantRegexp)),
+          constantShortcut = "{{"+constantDefinition[1]+"}}",
+          constantValue = constantDefinition[2];
+      while (overpassQuery.indexOf(constantShortcut) >= 0) {
+        overpassQuery = overpassQuery.replace(constantShortcut, constantValue);
+      }
+    });
+    // 3. shortcuts
     var shortcutRegexp = "{{(date|geocodeArea|geocodeCoords):([\\s\\S]*?)}}";
     var shortcuts = overpassQuery.match(new RegExp(shortcutRegexp, 'g')) || [];
     Promise.all(shortcuts.map(function(shortcut) {
