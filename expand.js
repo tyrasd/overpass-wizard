@@ -78,8 +78,36 @@ function geocodeCoords(instr) {
   });
 }
 
-module.exports = {
+var expansions = {
   date: relativeTime,
   geocodeArea: geocodeArea,
   geocodeCoords: geocodeCoords
+};
+
+module.exports = function(overpassQuery, bbox) {
+  // 1. bbox
+  if (bbox) overpassQuery = overpassQuery.replace(/{{bbox}}/g, bbox);
+  // 2. constants
+  var constantRegexp = "{{([a-zA-Z0-9_]+)=(.+?)}}";
+  var constants = overpassQuery.match(new RegExp(constantRegexp, 'g')) || [];
+  constants.forEach(function(constant) {
+    var constantDefinition = constant.match(new RegExp(constantRegexp)),
+        constantShortcut = "{{"+constantDefinition[1]+"}}",
+        constantValue = constantDefinition[2];
+    while (overpassQuery.indexOf(constantShortcut) >= 0) {
+      overpassQuery = overpassQuery.replace(constantShortcut, constantValue);
+    }
+  });
+  // 3. shortcuts
+  var shortcutRegexp = "{{(date|geocodeArea|geocodeCoords):([\\s\\S]*?)}}";
+  var shortcuts = overpassQuery.match(new RegExp(shortcutRegexp, 'g')) || [];
+  return Promise.all(shortcuts.map(function(shortcut) {
+    shortcut = shortcut.match(new RegExp(shortcutRegexp));
+    return expansions[shortcut[1]](shortcut[2]);
+  })).then(function(expansions) {
+    expansions.forEach(function(expansion, index) {
+      overpassQuery = overpassQuery.replace(shortcuts[index], expansion);
+    });
+    return overpassQuery;
+  });
 };
