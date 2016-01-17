@@ -52,7 +52,7 @@ module.exports = function wizard(search, options) {
     //freeFormPresets: [], ?
     //todo: more fine grained controll, e.g. to deactivate "in X"
     timeout: 25,
-    //memory: undefined, // todo: rename
+    maxsize: undefined,
     outputFormat: "json", // "json", "xml"
     aroundRadius: 1000
   }
@@ -97,6 +97,7 @@ module.exports = function wizard(search, options) {
   query_parts.push(
     '[out:'+options.outputFormat+']'+
     '[timeout:'+options.timeout+']'+
+    (options.maxsize !== undefined ? '[maxsize:'+options.maxsize+']' : '')+
     (options.globalBbox ? '[bbox:{{bbox}}]' : '')+
   ';');
 
