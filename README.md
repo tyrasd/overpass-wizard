@@ -3,6 +3,8 @@ overpass-wizard
 
 Generates [Overpass API](http://overpass-api.de) queries from [human friendly](osm wiki: http://wiki.openstreetmap.org/wiki/Overpass_turbo/Wizard) input. As seen in [overpass turbo](http://overpass-turbo.eu/).
 
+[![Build Status](https://secure.travis-ci.org/tyrasd/overpass-wizard.png)](https://travis-ci.org/tyrasd/overpass-wizard)
+
 command line utility
 --------------------
 
