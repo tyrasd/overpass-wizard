@@ -1,20 +1,30 @@
 #!/usr/bin/env node
 
-var opt = require('optimist')
-        .usage('Usage: $0 SEARCH')
-        .string('bbox').describe('bbox','string to replace {{bbox}} shortcuts with')
-        .string('no-expand').describe('no-expand','don\'t expand query placeholders/shortcuts, such as {{bbox}}, {{geocodeArea}}, etc.')
-        .boolean('version').describe('version','display software version')
-        .boolean('help').describe('help','print this help message'),
-    argv = opt.argv,
+var argv = require('yargs')
+        .usage('Usage: $0 [options] <SEARCH>')
+        .example('$0 "foo=bar"', 'constructs a query that returns all OSM objects with the tag foo=bar')
+
+        .boolean('no-expand').describe('no-expand','don\'t expand query placeholders/shortcuts, such as {{bbox}}, {{geocodeArea}}, etc.')
+        .string('bbox').alias('b', 'bbox').describe('bbox','string to replace {{bbox}} shortcuts with')
+        .string('around-radius').describe('around-radius','radius to use for "around <location>" queries')
+
+        .string('timeout').alias('t', 'timeout').default('timeout', 25).describe('timeout','timeout of overpass query in seconds')
+        .string('maxsize').describe('maxsize','memory limit of overpass query (in bytes)')
+        .string('output-format').alias('f', 'output-format').default('output-format', 'json').describe('output-format','set the output format to json or xml')
+        .string('output-mode').alias('m', 'output-mode').default('output-mode', 'geom').describe('output-mode','specify the output mode (either "recursive" or any valid value of the Overpass out statement)')
+        .boolean('no-comments').describe('no-comments','hide inline comments')
+        .boolean('no-global-bbox').describe('no-global-bbox','use local bbox filters instead of a global per-query one')
+        .group(['timeout', 'maxsize', 'output-format', 'output-mode', 'no-comments', 'no-global-bbox'], 'Overpass Query Modifiers')
+
+        .boolean('version').alias('v', 'version').describe('version','display software version')
+        .help('help').alias('h', 'help').describe('help','print this help message')
+        .argv,
+
     concat = require('concat-stream'),
     Promise = require('promise'),
     expand = require('./expand'),
     wizard = require('.');
 
-if (argv.help) {
-    return opt.showHelp();
-}
 if (argv.version) {
     return process.stdout.write(require('./package.json').version+'\n');
 }
@@ -31,7 +41,15 @@ if (search.length === 0) {
 
 function generateAndPrintQuery(search) {
   if (typeof search !== 'string') search = search.toString().trim();
-  var overpassQuery = wizard(search);
+  var overpassQuery = wizard(search, {
+    comment: argv.comments !== false,
+    outputMode: argv.outputMode, // "recursive", "geom", "ids", "…" (out *)
+    globalBbox: argv.globalBbox !== false,
+    timeout: argv.timeout,
+    maxsize: argv.maxsize,
+    outputFormat: argv.outputFormat, // "json", "xml"
+    aroundRadius: argv.aroundRadius
+  })+"\n";
   if (overpassQuery === false) {
     return process.exit(1);
   }

@@ -55,8 +55,7 @@ module.exports = function wizard(search, options) {
     maxsize: undefined,
     outputFormat: "json", // "json", "xml"
     aroundRadius: 1000
-  }
-  // todo: document options
+  };
 
   for (var k in options) {
     defaults[k] = options[k];
@@ -328,7 +327,7 @@ module.exports = function wizard(search, options) {
     query_parts.push('>;');
     query_parts.push('out skel qt;');
   } else {
-    query_parts.push('out ' + options.outputMode);
+    query_parts.push('out ' + options.outputMode + ';');
   }
 
   return query_parts.join('\n');
