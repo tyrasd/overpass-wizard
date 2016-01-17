@@ -96,7 +96,7 @@ module.exports = function wizard(search, options) {
     '[out:'+options.outputFormat+']'+
     '[timeout:'+options.timeout+']'+
     (options.maxsize !== undefined ? '[maxsize:'+options.maxsize+']' : '')+
-    (options.globalBbox ? '[bbox:{{bbox}}]' : '')+
+    (options.globalBbox && parsedQuery.bounds === "bbox" ? '[bbox:{{bbox}}]' : '')+
   ';');
 
   switch(parsedQuery.bounds) {
