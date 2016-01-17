@@ -49,12 +49,12 @@ module.exports = function wizard(search, options) {
     comment: true,
     outputMode: "geom", // "recursive", "geom", "ids", "…" (out *)
     globalBbox: true,
-    //freeFormPresets: [], ?
     //todo: more fine grained controll, e.g. to deactivate "in X"
     timeout: 25,
     maxsize: undefined,
     outputFormat: "json", // "json", "xml"
-    aroundRadius: 1000
+    aroundRadius: 1000,
+    freeFormPresets: undefined
   };
 
   for (var k in options) {
@@ -276,13 +276,13 @@ module.exports = function wizard(search, options) {
       var cond_query = and_query.queries[j];
       // todo: looks like some code duplication here could be reduced by refactoring
       if (cond_query.query === "free form") {
-        console.error("not yet implemented")
-        return
         // eventually load free form query module
-        if (!freeFormQuery) freeFormQuery = turbo.ffs.free();
+        if (!freeFormQuery) freeFormQuery = require('./free')(options.freeFormPresets);
         var ffs_clause = freeFormQuery.get_query_clause(cond_query);
-        if (ffs_clause === false)
+        if (ffs_clause === false) {
+          console.error("Couldn't find preset for free form input: "+cond_query.free)
           return false;
+        }
         // restrict possible data types
         types = types.filter(function(t) {
           return ffs_clause.types.indexOf(t) != -1;

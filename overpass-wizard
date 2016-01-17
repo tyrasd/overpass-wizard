@@ -20,6 +20,7 @@ var argv = require('yargs')
         .help('help').alias('h', 'help').describe('help','print this help message')
         .argv,
 
+    fs = require('fs'),
     concat = require('concat-stream'),
     Promise = require('promise'),
     expand = require('./expand'),
@@ -48,11 +49,13 @@ function generateAndPrintQuery(search) {
     timeout: argv.timeout,
     maxsize: argv.maxsize,
     outputFormat: argv.outputFormat, // "json", "xml"
-    aroundRadius: argv.aroundRadius
-  })+"\n";
+    aroundRadius: argv.aroundRadius,
+    freeFormPresets: argv.presetsFile ? JSON.parse(fs.readFileSync(argv.presetsFile)) : undefined
+  });
   if (overpassQuery === false) {
     return process.exit(1);
   }
+  overpassQuery += "\n";
   if (argv.expand !== false) {
     // expand shortcuts
     // 1. bbox
