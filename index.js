@@ -47,8 +47,8 @@ function normalize(query) {
 module.exports = function wizard(search, options) {
   var defaults = {
     comment: true,
-    outputMode: "recursive", // "recursive", "geom", "ids", "…" (out *)
-    globalBbox: false,
+    outputMode: "geom", // "recursive", "geom", "ids", "…" (out *)
+    globalBbox: true,
     //freeFormPresets: [], ?
     //todo: more fine grained controll, e.g. to deactivate "in X"
     timeout: 25,
@@ -57,7 +57,6 @@ module.exports = function wizard(search, options) {
     aroundRadius: 1000
   }
   // todo: document options
-  // todo: re-tweak defaults (e.g. globalBbox->true, outputMode->geom)
 
   for (var k in options) {
     defaults[k] = options[k];
