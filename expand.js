@@ -1,3 +1,8 @@
+/*
+ * partial implementation of overpass turbo extended query syntax
+ * (http://wiki.openstreetmap.org/wiki/Overpass_turbo/Extended_Overpass_Queries)
+ */
+
 var Promise = require('promise'),
     request = require('request-promise');
 
@@ -39,14 +44,44 @@ function relativeTime(instr, callback) {
   return Promise.resolve((new Date(date)).toISOString());
 }
 
+// Promise wrapper for browser XMLHttpRequest
+// from http://www.html5rocks.com/en/tutorials/es6/promises/
+function get(url) {
+  return new Promise(function(resolve, reject) {
+    var req = new XMLHttpRequest();
+    req.open('GET', url);
+
+    req.onload = function() {
+      if (req.status == 200) {
+        resolve(req.response);
+      }
+      else {
+        reject(Error("XMLHttpRequest Error: "+req.statusText));
+      }
+    };
+    req.onerror = function() {
+      reject(Error("Network Error"));
+    };
+    req.send();
+  });
+}
 // helper function to query nominatim for best fitting result
 function nominatimRequest(search,filter) {
-  return request({
-    url: "https://nominatim.openstreetmap.org/search?format=json&q="+encodeURIComponent(search),
-    method: "GET",
-    headers: {"User-Agent": "overpass-wizard"},
-    json: true
-  }).then(function(data) {
+  var requestUrl = "https://nominatim.openstreetmap.org/search?format=json&q="+encodeURIComponent(search);
+  var _request;
+  if (typeof XMLHttpRequest !== "undefined") {
+    // browser
+    _request = get(requestUrl).then(JSON.parse);
+  } else {
+    // node
+    _request = request({
+      url: requestUrl,
+      method: "GET",
+      headers: {"User-Agent": "overpass-wizard"},
+      json: true
+    });
+  }
+  return _request.then(function(data) {
     if (filter)
       data = data.filter(filter);
     if (data.length === 0)
