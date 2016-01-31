@@ -47,7 +47,7 @@ function normalize(query) {
 module.exports = function wizard(search, options) {
   var defaults = {
     comment: true,
-    outputMode: "geom", // "recursive", "geom", "ids", "…" (out *)
+    outputMode: "geom", // "recursive", "recursive_meta", out <*> ("geom", "ids", …)
     globalBbox: true,
     //todo: more fine grained controll, e.g. to deactivate "in X"
     timeout: 25,
@@ -328,6 +328,9 @@ module.exports = function wizard(search, options) {
     query_parts.push('out body;');
     query_parts.push('>;');
     query_parts.push('out skel qt;');
+  } else if (options.outputMode === "recursive_meta") {
+    query_parts.push('(._;>;);');
+    query_parts.push('out meta;');
   } else {
     query_parts.push('out ' + options.outputMode + ';');
   }
