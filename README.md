@@ -26,7 +26,7 @@ Install via npm: `npm install --save overpass-wizard`. The module exposes a sing
 * `search`: the wizard search string to be concerted into an Overpass API query
 * `options`: optional options
   * `outputFormat`: output [data format](http://wiki.openstreetmap.org/wiki/Overpass_API/Overpass_QL#Output_Format_.28out.29). either `json` (default) or `xml`
-  * `outputFormat`: specifies the output mode. either `recursive`, `recursive_meta` or any valid value of the Overpass [out statement](http://wiki.openstreetmap.org/wiki/Overpass_API/Overpass_QL#Print_.28out.29) (default: `geom`)
+  * `outputMode`: specifies the output mode. either `recursive`, `recursive_meta` or any valid value of the Overpass [out statement](http://wiki.openstreetmap.org/wiki/Overpass_API/Overpass_QL#Print_.28out.29) (default: `geom`)
   * `timeout`: query [timeout](http://wiki.openstreetmap.org/wiki/Overpass_API/Overpass_QL#timeout) in seconds (default: 25)
   * `maxsize`: memory [limit](http://wiki.openstreetmap.org/wiki/Overpass_API/Overpass_QL#Element_limit_.28maxsize.29) in bytes
   * `globalBbox`: produces a [global bounding box](http://wiki.openstreetmap.org/wiki/Overpass_API/Overpass_QL#Global_bounding_box_.28bbox.29) query (default: true)
