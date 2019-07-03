@@ -6,7 +6,9 @@
   "scripts": {
     "pretest": "npm ls --depth=Infinity > /dev/null",
     "test": "npm run test-lib",
-    "test-lib": "mocha -R spec"
+    "test-lib": "mocha -R spec",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
   },
   "bin": {
     "overpass-wizard": "overpass-wizard"
@@ -29,7 +31,8 @@
     "concat-stream": "~1.0.1",
     "promise": "^7.1.1",
     "request-promise": "^2.0.0",
-    "yargs": "^3.32.0"
+    "yargs": "^3.32.0",
+    "snyk": "^1.189.0"
   },
   "devDependencies": {
     "expect.js": "^0.3.1",
@@ -38,5 +41,6 @@
   },
   "browser": {
     "request-promise": false
-  }
+  },
+  "snyk": true
 }
