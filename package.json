@@ -1,9 +1,10 @@
 {
   "name": "overpass-wizard",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Human friendly way to generate Overpass API queries",
   "main": "index.js",
   "scripts": {
+    "build": "pegjs -O size < wizard.pegjs > parser.js",
     "pretest": "npm ls --depth=Infinity > /dev/null",
     "test": "npm run test-lib",
     "test-lib": "mocha -R spec"
@@ -34,7 +35,7 @@
   "devDependencies": {
     "expect.js": "^0.3.1",
     "mocha": "^2.3.4",
-    "pegjs": "^0.9.0"
+    "pegjs": "^0.10.0"
   },
   "browser": {
     "request-promise": false

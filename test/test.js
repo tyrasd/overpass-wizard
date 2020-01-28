@@ -25,122 +25,155 @@ var testOptions = {
   aroundRadius: 1000
 }
 
+function checkWizard(inStrings, outString) {
+  if (!Array.isArray(inStrings)) {
+    inStrings = [inStrings];
+  }
+  for (var i in inStrings) {
+    var result = wizard(inStrings[i], testOptions);
+    expect(compact(result)).to.equal(outString + out_str);
+  }
+}
+
 // basic conditions
 describe("basic conditions", function () {
   // key
   it("key=*", function () {
-    var search = "foo=*";
-    var result = wizard(search, testOptions);
-    expect(compact(result)).to.equal(
+    checkWizard(
+      ["foo=*", "foo==*", "foo is not null"],
       "("+
         "node[\"foo\"](bbox);"+
         "way[\"foo\"](bbox);"+
         "relation[\"foo\"](bbox);"+
-      ");"+
-      out_str
+      ");"
     );
   });
   // not key
   it("key!=*", function () {
-    var search = "foo!=*";
-    var result = wizard(search, testOptions);
-    expect(compact(result)).to.equal(
+    checkWizard(
+      ["foo!=*", "foo<>*", "foo is null"],
       "("+
         "node[\"foo\"!~\".*\"](bbox);"+
         "way[\"foo\"!~\".*\"](bbox);"+
         "relation[\"foo\"!~\".*\"](bbox);"+
-      ");"+
-      out_str
+      ");"
     );
   });
   // key-value
   it("key=value", function () {
-    var search = "foo=bar";
-    var result = wizard(search, testOptions);
-    expect(compact(result)).to.equal(
+    checkWizard(
+      ["foo=bar", "foo==bar"],
       "("+
         "node[\"foo\"=\"bar\"](bbox);"+
         "way[\"foo\"=\"bar\"](bbox);"+
         "relation[\"foo\"=\"bar\"](bbox);"+
-      ");"+
-      out_str
+      ");"
     );
   });
   // not key-value
   it("key!=value", function () {
-    var search = "foo!=bar";
-    var result = wizard(search, testOptions);
-    expect(compact(result)).to.equal(
+    checkWizard(
+      ["foo!=bar", "foo<>bar"],
       "("+
         "node[\"foo\"!=\"bar\"](bbox);"+
         "way[\"foo\"!=\"bar\"](bbox);"+
         "relation[\"foo\"!=\"bar\"](bbox);"+
-      ");"+
-      out_str
+      ");"
     );
   });
   // regex key-value
   it("key~value", function () {
-    var search = "foo~bar";
-    var result = wizard(search, testOptions);
-    expect(compact(result)).to.equal(
+    checkWizard(
+      [
+        "foo~bar", "foo~/bar/",
+        "foo~=bar", "foo~=/bar/",
+        "foo like bar", "foo like /bar/",
+      ],
       "("+
         "node[\"foo\"~\"bar\"](bbox);"+
         "way[\"foo\"~\"bar\"](bbox);"+
         "relation[\"foo\"~\"bar\"](bbox);"+
-      ");"+
-      out_str
+      ");"
+    );
+    // case insensitivity flag
+    checkWizard(
+      "foo~/bar/i",
+      "("+
+        "node[\"foo\"~\"bar\",i](bbox);"+
+        "way[\"foo\"~\"bar\",i](bbox);"+
+        "relation[\"foo\"~\"bar\",i](bbox);"+
+      ");"
     );
   });
-  // regex key
+  // regex key + regex value
   it("~key~value", function () {
-    var search = "~foo~bar";
-    var result = wizard(search, testOptions);
-    expect(compact(result)).to.equal(
+    checkWizard(
+      [
+        "~foo~bar", "~foo~/bar/", "~/foo/~bar", "~/foo/~/bar/",
+        "~foo~=bar", "~foo~=/bar/", "~/foo/~=bar", "~/foo/~=/bar/",
+      ],
       "("+
         "node[~\"foo\"~\"bar\"](bbox);"+
         "way[~\"foo\"~\"bar\"](bbox);"+
         "relation[~\"foo\"~\"bar\"](bbox);"+
-      ");"+
-      out_str
+      ");"
+    );
+    // case insensitivity flag
+    checkWizard(
+      "~/foo/i~/bar/i",
+      "("+
+        "node[~\"foo\"~\"bar\",i](bbox);"+
+        "way[~\"foo\"~\"bar\",i](bbox);"+
+        "relation[~\"foo\"~\"bar\",i](bbox);"+
+      ");"
+    );
+    checkWizard(
+      "~/foo/~/bar/i",
+      "("+
+        "node[~\"foo\"~\"bar\",i][~\"foo\"~\".*\"](bbox);"+
+        "way[~\"foo\"~\"bar\",i][~\"foo\"~\".*\"](bbox);"+
+        "relation[~\"foo\"~\"bar\",i][~\"foo\"~\".*\"](bbox);"+
+      ");"
+    );
+    checkWizard(
+      "~/foo/i~/bar/",
+      "("+
+        "node[~\"foo\"~\"bar\",i][~\".*\"~\"bar\"](bbox);"+
+        "way[~\"foo\"~\"bar\",i][~\".*\"~\"bar\"](bbox);"+
+        "relation[~\"foo\"~\"bar\",i][~\".*\"~\"bar\"](bbox);"+
+      ");"
     );
   });
   // not regex key-value
   it("key!~value", function () {
-    var search = "foo!~bar";
-    var result = wizard(search, testOptions);
-    expect(compact(result)).to.equal(
+    checkWizard(
+      ["foo!~bar", "foo not like bar"],
       "("+
         "node[\"foo\"!~\"bar\"](bbox);"+
         "way[\"foo\"!~\"bar\"](bbox);"+
         "relation[\"foo\"!~\"bar\"](bbox);"+
-      ");"+
-      out_str
+      ");"
     );
   });
   // susbtring key-value
   it("key:value", function () {
     // normal case: just do a regex search
-    var search = "foo:bar";
-    var result = wizard(search, testOptions);
-    expect(compact(result)).to.equal(
+    checkWizard(
+      "foo:bar",
       "("+
         "node[\"foo\"~\"bar\"](bbox);"+
         "way[\"foo\"~\"bar\"](bbox);"+
         "relation[\"foo\"~\"bar\"](bbox);"+
-      ");"+
-      out_str
+      ");"
     );
     // but also escape special characters
-    search = "foo:'*'";
-    result = wizard(search, testOptions);
-    expect(compact(result)).to.equal(
+    checkWizard(
+      "foo:'*'",
       "("+
         "node[\"foo\"~\"\\\\*\"](bbox);"+
         "way[\"foo\"~\"\\\\*\"](bbox);"+
         "relation[\"foo\"~\"\\\\*\"](bbox);"+
-      ");"+
-      out_str
+      ");"
     );
   });
 });
@@ -150,82 +183,67 @@ describe("data types", function () {
   describe("strings", function () {
     // strings
     it("double quoted strings", function () {
-      var search, result;
       // double-quoted string
-      search = '"a key"="a value"';
-      result = wizard(search, testOptions);
-      expect(compact(result)).to.equal(
+      checkWizard(
+        '"a key"="a value"',
         '('+
           'node["a key"="a value"](bbox);'+
           'way["a key"="a value"](bbox);'+
           'relation["a key"="a value"](bbox);'+
-        ');'+
-        out_str
+        ');'
       );
     });
     it("single-quoted string", function () {
-      var search, result;
       // single-quoted string
-      search = "'foo bar'='asd fasd'";
-      result = wizard(search, testOptions);
-      expect(compact(result)).to.equal(
+      checkWizard(
+        "'foo bar'='asd fasd'",
         '('+
           'node["foo bar"="asd fasd"](bbox);'+
           'way["foo bar"="asd fasd"](bbox);'+
           'relation["foo bar"="asd fasd"](bbox);'+
-        ');'+
-        out_str
+        ');'
       );
     });
     it("quoted unicode string", function () {
-      var search = "name='بیجنگ'";
-      var result = wizard(search, testOptions);
-      expect(compact(result)).to.equal(
+      checkWizard(
+        "name='بیجنگ'",
         '('+
           'node["name"="بیجنگ"](bbox);'+
           'way["name"="بیجنگ"](bbox);'+
           'relation["name"="بیجنگ"](bbox);'+
-        ');'+
-        out_str
+        ');'
       );
     });
     it("unicode string", function () {
-      var search = "name=Béziers";
-      var result = wizard(search, testOptions);
-      expect(compact(result)).to.equal(
+      checkWizard(
+        "name=Béziers",
         '('+
           'node["name"="Béziers"](bbox);'+
           'way["name"="Béziers"](bbox);'+
           'relation["name"="Béziers"](bbox);'+
-        ');'+
-        out_str
+        ');'
       );
     });
   });
   // regexes
   it("regex", function () {
-    var search, result;
     // simple regex
-    search = "foo~/bar/";
-    result = wizard(search, testOptions);
-    expect(compact(result)).to.equal(
+    checkWizard(
+      "foo~/bar/",
       "("+
         "node[\"foo\"~\"bar\"](bbox);"+
         "way[\"foo\"~\"bar\"](bbox);"+
         "relation[\"foo\"~\"bar\"](bbox);"+
-      ");"+
-      out_str
+      ");"
     );
     // simple regex with modifier
-    search = "foo~/bar/i";
-    result = wizard(search, testOptions);
-    expect(compact(result)).to.equal(
+    checkWizard(
+      "foo~/bar/i",
       "("+
         "node[\"foo\"~\"bar\",i](bbox);"+
         "way[\"foo\"~\"bar\",i](bbox);"+
         "relation[\"foo\"~\"bar\",i](bbox);"+
-      ");"+
-      out_str
+      ");"
     );
   });
 });
@@ -234,61 +252,27 @@ describe("data types", function () {
 describe("boolean logic", function () {
   // logical and
   it("logical and", function () {
-    var search = "foo=bar and asd=fasd";
-    var result = wizard(search, testOptions);
-    expect(compact(result)).to.equal(
+    checkWizard(
+      [
+        "foo=bar and asd=fasd",
+        "foo=bar & asd=fasd",
+        "foo=bar && asd=fasd",
+      ],
       "("+
         "node[\"foo\"=\"bar\"][\"asd\"=\"fasd\"](bbox);"+
         "way[\"foo\"=\"bar\"][\"asd\"=\"fasd\"](bbox);"+
         "relation[\"foo\"=\"bar\"][\"asd\"=\"fasd\"](bbox);"+
-      ");"+
-      out_str
-    );
-  });
-  it("logical and (& operator)", function () {
-    var search = "foo=bar & asd=fasd";
-    var result = wizard(search, testOptions);
-    expect(compact(result)).to.equal(
-      '('+
-        'node["foo"="bar"]["asd"="fasd"](bbox);'+
-        'way["foo"="bar"]["asd"="fasd"](bbox);'+
-        'relation["foo"="bar"]["asd"="fasd"](bbox);'+
-      ');'+
-      out_str
-    );
-  });
-  it("logical and (&& operator)", function () {
-    var search = "foo=bar && asd=fasd";
-    var result = wizard(search, testOptions);
-    expect(compact(result)).to.equal(
-      '('+
-        'node["foo"="bar"]["asd"="fasd"](bbox);'+
-        'way["foo"="bar"]["asd"="fasd"](bbox);'+
-        'relation["foo"="bar"]["asd"="fasd"](bbox);'+
-      ');'+
-      out_str
+      ");"
     );
   });
   // logical or
   it("logical or", function () {
-    var search = "foo=bar or asd=fasd";
-    var result = wizard(search, testOptions);
-    expect(compact(result)).to.equal(
-      "("+
-        "node[\"foo\"=\"bar\"](bbox);"+
-        "way[\"foo\"=\"bar\"](bbox);"+
-        "relation[\"foo\"=\"bar\"](bbox);"+
-        "node[\"asd\"=\"fasd\"](bbox);"+
-        "way[\"asd\"=\"fasd\"](bbox);"+
-        "relation[\"asd\"=\"fasd\"](bbox);"+
-      ");"+
-      out_str
-    );
-  });
-  it("logical or (| operator)", function () {
-    var search = "foo=bar | asd=fasd";
-    var result = wizard(search, testOptions);
-    expect(compact(result)).to.equal(
+    checkWizard(
+      [
+        "foo=bar or asd=fasd",
+        "foo=bar | asd=fasd",
+        "foo=bar || asd=fasd"
+      ],
       '('+
         'node["foo"="bar"](bbox);'+
         'way["foo"="bar"](bbox);'+
@@ -296,30 +280,13 @@ describe("boolean logic", function () {
         'node["asd"="fasd"](bbox);'+
         'way["asd"="fasd"](bbox);'+
         'relation["asd"="fasd"](bbox);'+
-      ');'+
-      out_str
-    );
-  });
-  it("logical or (|| operator)", function () {
-    var search = "foo=bar || asd=fasd";
-    var result = wizard(search, testOptions);
-    expect(compact(result)).to.equal(
-      '('+
-        'node["foo"="bar"](bbox);'+
-        'way["foo"="bar"](bbox);'+
-        'relation["foo"="bar"](bbox);'+
-        'node["asd"="fasd"](bbox);'+
-        'way["asd"="fasd"](bbox);'+
-        'relation["asd"="fasd"](bbox);'+
-      ');'+
-      out_str
+      ');'
     );
   });
   // boolean expression
   it("boolean expression", function () {
-    var search = "(foo=* or bar=*) and (asd=* or fasd=*)";
-    var result = wizard(search, testOptions);
-    expect(compact(result)).to.equal(
+    checkWizard(
+      "(foo=* or bar=*) and (asd=* or fasd=*)",
       "("+
         "node[\"foo\"][\"asd\"](bbox);"+
         "way[\"foo\"][\"asd\"](bbox);"+
@@ -333,8 +300,7 @@ describe("boolean logic", function () {
         "node[\"bar\"][\"fasd\"](bbox);"+
         "way[\"bar\"][\"fasd\"](bbox);"+
         "relation[\"bar\"][\"fasd\"](bbox);"+
-      ");"+
-      out_str
+      ");"
     );
   });
 });
@@ -344,96 +310,78 @@ describe("meta conditions", function () {
   // type
   it("type", function () {
     // simple
-    var search = "foo=bar and type:node";
-    var result = wizard(search, testOptions);
-    expect(compact(result)).to.equal(
+    checkWizard(
+      "foo=bar and type:node",
       "("+
         "node[\"foo\"=\"bar\"](bbox);"+
-      ");"+
-      out_str
+      ");"
     );
     // multiple types
-    search = "foo=bar and (type:node or type:way)";
-    result = wizard(search, testOptions);
-    expect(compact(result)).to.equal(
+    checkWizard(
+      "foo=bar and (type:node or type:way)",
       "("+
         "node[\"foo\"=\"bar\"](bbox);"+
         "way[\"foo\"=\"bar\"](bbox);"+
-      ");"+
-      out_str
+      ");"
     );
     // excluding types
-    search = "foo=bar and type:node and type:way";
-    result = wizard(search, testOptions);
-    expect(compact(result)).to.equal(
+    checkWizard(
+      "foo=bar and type:node and type:way",
       "("+
-      ");"+
-      out_str
+      ");"
     );
   });
   // newer
   it("newer", function () {
     // regular
-    var search = "newer:\"2000-01-01T01:01:01Z\" and type:node";
-    var result = wizard(search, testOptions);
-    expect(compact(result)).to.equal(
+    checkWizard(
+      "newer:\"2000-01-01T01:01:01Z\" and type:node",
       "("+
         "node(newer:\"2000-01-01T01:01:01Z\")(bbox);"+
-      ");"+
-      out_str
+      ");"
     );
     // relative
-    search = "newer:1day and type:node";
-    result = wizard(search, testOptions);
-    expect(compact(result)).to.equal(
+    checkWizard(
+      "newer:1day and type:node",
       "("+
         "node(newer:\"date:1day\")(bbox);"+
-      ");"+
-      out_str
+      ");"
     );
   });
   // user
   it("user", function () {
     // user name
-    var search = "user:foo and type:node";
-    var result = wizard(search, testOptions);
-    expect(compact(result)).to.equal(
+    checkWizard(
+      "user:foo and type:node",
       "("+
         "node(user:\"foo\")(bbox);"+
-      ");"+
-      out_str
+      ");"
     );
     // uid
-    search = "uid:123 and type:node";
-    result = wizard(search, testOptions);
-    expect(compact(result)).to.equal(
+    checkWizard(
+      "uid:123 and type:node",
       "("+
         "node(uid:123)(bbox);"+
-      ");"+
-      out_str
+      ");"
     );
   });
   // id
   it("id", function () {
     // with type
-    var search = "id:123 and type:node";
-    var result = wizard(search, testOptions);
-    expect(compact(result)).to.equal(
+    checkWizard(
+      "id:123 and type:node",
       "("+
         "node(123)(bbox);"+
-      ");"+
-      out_str
+      ");"
     );
     // without type
-    search = "id:123";
-    result = wizard(search, testOptions);
-    expect(compact(result)).to.equal(
+    checkWizard(
+      "id:123",
       "("+
         "node(123)(bbox);"+
         "way(123)(bbox);"+
         "relation(123)(bbox);"+
-      ");"+
-      out_str
+      ");"
     );
   });
 });
@@ -442,57 +390,47 @@ describe("meta conditions", function () {
 describe("regions", function () {
   // global
   it("global", function () {
-    var search = "foo=bar and type:node global";
-    var result = wizard(search, testOptions);
-    expect(compact(result)).to.equal(
+    checkWizard(
+      "foo=bar and type:node global",
       "("+
         "node[\"foo\"=\"bar\"];"+
-      ");"+
-      out_str
+      ");"
     );
   });
   // bbox
   it("in bbox", function () {
     // implicit
-    var search = "type:node";
-    var result = wizard(search, testOptions);
-    expect(compact(result)).to.equal(
+    checkWizard(
+      "type:node",
       "("+
         "node(bbox);"+
-      ");"+
-      out_str
+      ");"
     );
     // explicit
-    search = "type:node in bbox";
-    result = wizard(search, testOptions);
-    expect(compact(result)).to.equal(
+    checkWizard(
+      "type:node in bbox",
       "("+
         "node(bbox);"+
-      ");"+
-      out_str
+      ");"
     );
   });
   // area
   it("in area", function () {
-    var search = "type:node in foobar";
-    var result = wizard(search, testOptions);
-    expect(compact(result)).to.equal(
+    checkWizard(
+      "type:node in foobar",
       "area(foobar)->.searchArea;"+
       "("+
         "node(area.searchArea);"+
-      ");"+
-      out_str
+      ");"
     );
   });
   // around
   it("around", function () {
-    var search = "type:node around foobar";
-    var result = wizard(search, testOptions);
-    expect(compact(result)).to.equal(
+    checkWizard(
+      "type:node around foobar",
       "("+
         "node(around:,coords:foobar);"+
-      ");"+
-      out_str
+      ");"
     );
   });
 
@@ -585,56 +523,46 @@ describe("free form", function () {
 describe("special cases", function () {
   // empty value
   it("empty value", function () {
-    var search = "foo='' and type:way";
-    var result = wizard(search, testOptions);
-    expect(compact(result)).to.equal(
+    checkWizard(
+      "foo='' and type:way",
       "("+
         "way[\"foo\"~\"^$\"](bbox);"+
-      ");"+
-      out_str
+      ");"
     );
   });
   // empty key
   it("empty key", function () {
-    var search = "''=bar and type:way";
-    var result = wizard(search, testOptions);
-    expect(compact(result)).to.equal(
+    checkWizard(
+      "''=bar and type:way",
       "("+
         "way[~\"^$\"~\"^bar$\"](bbox);"+
-      ");"+
-      out_str
+      ");"
     );
     // make sure stuff in the value section gets escaped properly
-    search = "''='*' and type:way";
-    result = wizard(search, testOptions);
-    expect(compact(result)).to.equal(
+    checkWizard(
+      "''='*' and type:way",
       "("+
         "way[~\"^$\"~\"^\\\\*$\"](bbox);"+
-      ");"+
-      out_str
+      ");"
     );
     // does also work for =*, ~ and : searches
-    search = "(''=* or ''~/.../) and type:way";
-    result = wizard(search, testOptions);
-    expect(compact(result)).to.equal(
+    checkWizard(
+      "(''=* or ''~/.../) and type:way",
       "("+
         "way[~\"^$\"~\".*\"](bbox);"+
         "way[~\"^$\"~\"...\"](bbox);"+
-      ");"+
-      out_str
+      ");"
     );
   });
   // newlines, tabs
   it("newlines, tabs", function () {
-    var search = "(foo='\t' or foo='\n' or asd='\\t') and type:way";
-    var result = wizard(search, testOptions);
-    expect(compact(result)).to.equal(
+    checkWizard(
+      "(foo='\t' or foo='\n' or asd='\\t') and type:way",
       "("+
         "way[\"foo\"=\"\\t\"](bbox);"+
         "way[\"foo\"=\"\\n\"](bbox);"+
         "way[\"asd\"=\"\\t\"](bbox);"+
-      ");"+
-      out_str
+      ");"
     );
   });
 

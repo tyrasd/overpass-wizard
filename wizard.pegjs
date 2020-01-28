@@ -57,7 +57,7 @@ statement
   / free_form
 
 key_eq_val
-  = x:key_string _ ( "=" / "==" ) _ y:string
+  = x:key_string _ ( "==" / "=" ) _ y:string
     { return { query:"eq", key:x, val:y } }
 
 key_not_eq_val
@@ -65,7 +65,7 @@ key_not_eq_val
     { return { query:"neq", key:x, val:y } }
 
 key_present
-  = x:key_string _ ( "=" / "==" ) _ "*"
+  = x:key_string _ ( "==" / "=" ) _ "*"
     { return { query:"key", key:x } }
   / x:string whitespace+ ("is" whitespace+ "not" whitespace+ "null" / "IS" whitespace+ "NOT" whitespace+ "NULL")
     { return { query:"key", key:x } }
@@ -83,8 +83,8 @@ key_like_val
     { return { query:"like", key:x, val:y.regex?y:{regex:y} } }
 
 like_key_like_val
-  = "~" _ x:string/*(key_string / regexstring)*/ _ ( "~=" / "~" / "=~" ) _ y:(string / regexstring )
-    { return { query:"likelike", key:x, val:y.regex?y:{regex:y} } }
+  = "~" _ x:(string / regexstring) _ ( "~=" / "~" / "=~" ) _ y:(string / regexstring )
+    { return { query:"likelike", key:x.regex?x:{regex:x}, val:y.regex?y:{regex:y} } }
 
 key_not_like_val
   = x:key_string _ ( "!~" ) _ y:(string / regexstring )

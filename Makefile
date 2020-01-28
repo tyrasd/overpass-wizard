@@ -3,7 +3,8 @@
 PEGJS = ./node_modules/pegjs/bin/pegjs
 
 all:
-	$(PEGJS) -o size < wizard.pegjs > parser.js
+	npm update
+	npm run build
 
 clean:
 	rm parser.js

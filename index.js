@@ -157,15 +157,15 @@ module.exports = function wizard(search, options) {
     if (key === '') {
       if (condition.query === "key") {
         condition.query = "likelike";
-        key='^$';
+        condition.key={regex:'^$'};
         condition.val={regex: '.*'};
       } else if (condition.query === "eq") {
         condition.query = "likelike";
-        key='^$';
+        condition.key={regex:'^$'};
         condition.val={regex: '^'+escRegexp(condition.val)+'$'};
       } else if (condition.query === "like") {
         condition.query = "likelike";
-        key='^$';
+        condition.key={regex:'^$'};
       }
     }
     // construct the query clause
@@ -183,9 +183,23 @@ module.exports = function wizard(search, options) {
                +(condition.val.modifier==="i"?',i':'')
                +']';
       case "likelike":
-        return '[~"'+key+'"~"'+esc(condition.val.regex)+'"'
-               +(condition.val.modifier==="i"?',i':'')
-               +']';
+        if ((condition.key.modifier || '') == (condition.val.modifier || '')) {
+          return '[~"'+esc(condition.key.regex)+'"~"'+esc(condition.val.regex)+'"'
+                 +(condition.val.modifier==="i"?',i':'')
+                 +']';
+        } else if (condition.val.modifier==="i") {
+          return '[~"'+esc(condition.key.regex)+'"~"'+esc(condition.val.regex)+'",i]'
+                +'[~"'+esc(condition.key.regex)+'"~".*"]';
+        } else {
+          // this case ("value case sensitive, key case insensitive")
+          // is not actually possible in Overpass QL, but this workaround
+          // is close enough and such queries are not typical use-cases
+          // for overpass anyway.
+          // here's an example where the produced query doesn't exactly work:
+          // ~/name/i~/xxx/ would match an osm element with Name=XXX + Eman=xxx
+          return '[~"'+esc(condition.key.regex)+'"~"'+esc(condition.val.regex)+'",i]'
+                +'[~".*"~"'+esc(condition.val.regex)+'"]';
+        }
       case "notlike":
         return '["'+key+'"!~"'+esc(condition.val.regex)+'"'
                +(condition.val.modifier==="i"?',i':'')
@@ -236,7 +250,7 @@ module.exports = function wizard(search, options) {
       case "like":
         return quote_comment_str(quotes(condition.key)+'~'+quoteRegex(condition.val));
       case "likelike":
-        return quote_comment_str('~'+quotes(condition.key)+'~'+quoteRegex(condition.val));
+        return quote_comment_str('~'+quoteRegex(condition.key)+'~'+quoteRegex(condition.val));
       case "notlike":
         return quote_comment_str(quotes(condition.key)+'!~'+quoteRegex(condition.val));
       case "substr":
