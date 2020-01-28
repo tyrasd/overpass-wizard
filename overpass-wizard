@@ -5,6 +5,7 @@ var argv = require('yargs')
         .example('$0 "foo=bar"', 'constructs a query that returns all OSM objects with the tag foo=bar')
 
         .boolean('no-expand').describe('no-expand','don\'t expand query placeholders/shortcuts, such as {{bbox}}, {{geocodeArea}}, etc.')
+        .boolean('no-compact').describe('no-compact','don\'t use the compact "nwr" syntax (for use with older Overpass-API servers)')
         .string('bbox').alias('b', 'bbox').describe('bbox','string to replace {{bbox}} shortcuts with')
         .string('around-radius').describe('around-radius','radius to use for "around <location>" queries')
 
@@ -45,6 +46,7 @@ function generateAndPrintQuery(search) {
     comment: argv.comments !== false,
     outputMode: argv.outputMode, // "recursive", "geom", "ids", "…" (out *)
     globalBbox: argv.globalBbox !== false,
+    compactNWR: argv.compact !== false,
     timeout: argv.timeout,
     maxsize: argv.maxsize,
     outputFormat: argv.outputFormat, // "json", "xml"
