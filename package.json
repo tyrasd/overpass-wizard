@@ -1,6 +1,6 @@
 {
   "name": "overpass-wizard",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "Human friendly way to generate Overpass API queries",
   "main": "index.js",
   "scripts": {
