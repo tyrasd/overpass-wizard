@@ -30,6 +30,7 @@ Install via npm: `npm install --save overpass-wizard`. The module exposes a sing
   * `timeout`: query [timeout](http://wiki.openstreetmap.org/wiki/Overpass_API/Overpass_QL#timeout) in seconds (default: 25)
   * `maxsize`: memory [limit](http://wiki.openstreetmap.org/wiki/Overpass_API/Overpass_QL#Element_limit_.28maxsize.29) in bytes
   * `globalBbox`: produces a [global bounding box](http://wiki.openstreetmap.org/wiki/Overpass_API/Overpass_QL#Global_bounding_box_.28bbox.29) query (default: true)
+  * `compactNWR`: produces a query with `nwr` statements if possible (instead of listing `node`, `way` and `relation` separately), resulting in more compact results (default: true)
   * `aroundRadius`: radius (in m) to be used with `around <location>` searches (default: 1000)
   * `comment`: boolean or string. if false, no comments will be added to the Overpass query output. if it is a string, it will be used in the header to explain what the query is doing
   * `freeFormPresets`: (*experimental*) path to a JSON file with presets in the [schema](https://github.com/openstreetmap/iD/blob/master/data/presets/presets.json) used by the iD editor. Used to expand *free form* search input (e.g. `Hotel in Vienna`).

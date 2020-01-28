@@ -324,6 +324,8 @@ module.exports = function wizard(search, options) {
     // construct query
     if (options.comment)
       query_parts.push('  // query part for: “'+clauses_str+'”')
+    if (options.compactNWR !== false && types.length === 3)
+      types = ['nwr'];
     for (var t=0; t<types.length; t++) {
       var buffer = '  '+types[t];
       for (var c=0; c<clauses.length; c++)

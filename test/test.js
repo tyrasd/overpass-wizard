@@ -42,9 +42,7 @@ describe("basic conditions", function () {
     checkWizard(
       ["foo=*", "foo==*", "foo is not null"],
       "("+
-        "node[\"foo\"](bbox);"+
-        "way[\"foo\"](bbox);"+
-        "relation[\"foo\"](bbox);"+
+        "nwr[\"foo\"](bbox);"+
       ");"
     );
   });
@@ -53,9 +51,7 @@ describe("basic conditions", function () {
     checkWizard(
       ["foo!=*", "foo<>*", "foo is null"],
       "("+
-        "node[\"foo\"!~\".*\"](bbox);"+
-        "way[\"foo\"!~\".*\"](bbox);"+
-        "relation[\"foo\"!~\".*\"](bbox);"+
+        "nwr[\"foo\"!~\".*\"](bbox);"+
       ");"
     );
   });
@@ -64,9 +60,7 @@ describe("basic conditions", function () {
     checkWizard(
       ["foo=bar", "foo==bar"],
       "("+
-        "node[\"foo\"=\"bar\"](bbox);"+
-        "way[\"foo\"=\"bar\"](bbox);"+
-        "relation[\"foo\"=\"bar\"](bbox);"+
+        "nwr[\"foo\"=\"bar\"](bbox);"+
       ");"
     );
   });
@@ -75,9 +69,7 @@ describe("basic conditions", function () {
     checkWizard(
       ["foo!=bar", "foo<>bar"],
       "("+
-        "node[\"foo\"!=\"bar\"](bbox);"+
-        "way[\"foo\"!=\"bar\"](bbox);"+
-        "relation[\"foo\"!=\"bar\"](bbox);"+
+        "nwr[\"foo\"!=\"bar\"](bbox);"+
       ");"
     );
   });
@@ -90,18 +82,14 @@ describe("basic conditions", function () {
         "foo like bar", "foo like /bar/",
       ],
       "("+
-        "node[\"foo\"~\"bar\"](bbox);"+
-        "way[\"foo\"~\"bar\"](bbox);"+
-        "relation[\"foo\"~\"bar\"](bbox);"+
+        "nwr[\"foo\"~\"bar\"](bbox);"+
       ");"
     );
     // case insensitivity flag
     checkWizard(
       "foo~/bar/i",
       "("+
-        "node[\"foo\"~\"bar\",i](bbox);"+
-        "way[\"foo\"~\"bar\",i](bbox);"+
-        "relation[\"foo\"~\"bar\",i](bbox);"+
+        "nwr[\"foo\"~\"bar\",i](bbox);"+
       ");"
     );
   });
@@ -113,34 +101,26 @@ describe("basic conditions", function () {
         "~foo~=bar", "~foo~=/bar/", "~/foo/~=bar", "~/foo/~=/bar/",
       ],
       "("+
-        "node[~\"foo\"~\"bar\"](bbox);"+
-        "way[~\"foo\"~\"bar\"](bbox);"+
-        "relation[~\"foo\"~\"bar\"](bbox);"+
+        "nwr[~\"foo\"~\"bar\"](bbox);"+
       ");"
     );
     // case insensitivity flag
     checkWizard(
       "~/foo/i~/bar/i",
       "("+
-        "node[~\"foo\"~\"bar\",i](bbox);"+
-        "way[~\"foo\"~\"bar\",i](bbox);"+
-        "relation[~\"foo\"~\"bar\",i](bbox);"+
+        "nwr[~\"foo\"~\"bar\",i](bbox);"+
       ");"
     );
     checkWizard(
       "~/foo/~/bar/i",
       "("+
-        "node[~\"foo\"~\"bar\",i][~\"foo\"~\".*\"](bbox);"+
-        "way[~\"foo\"~\"bar\",i][~\"foo\"~\".*\"](bbox);"+
-        "relation[~\"foo\"~\"bar\",i][~\"foo\"~\".*\"](bbox);"+
+        "nwr[~\"foo\"~\"bar\",i][~\"foo\"~\".*\"](bbox);"+
       ");"
     );
     checkWizard(
       "~/foo/i~/bar/",
       "("+
-        "node[~\"foo\"~\"bar\",i][~\".*\"~\"bar\"](bbox);"+
-        "way[~\"foo\"~\"bar\",i][~\".*\"~\"bar\"](bbox);"+
-        "relation[~\"foo\"~\"bar\",i][~\".*\"~\"bar\"](bbox);"+
+        "nwr[~\"foo\"~\"bar\",i][~\".*\"~\"bar\"](bbox);"+
       ");"
     );
   });
@@ -149,9 +129,7 @@ describe("basic conditions", function () {
     checkWizard(
       ["foo!~bar", "foo not like bar"],
       "("+
-        "node[\"foo\"!~\"bar\"](bbox);"+
-        "way[\"foo\"!~\"bar\"](bbox);"+
-        "relation[\"foo\"!~\"bar\"](bbox);"+
+        "nwr[\"foo\"!~\"bar\"](bbox);"+
       ");"
     );
   });
@@ -161,18 +139,14 @@ describe("basic conditions", function () {
     checkWizard(
       "foo:bar",
       "("+
-        "node[\"foo\"~\"bar\"](bbox);"+
-        "way[\"foo\"~\"bar\"](bbox);"+
-        "relation[\"foo\"~\"bar\"](bbox);"+
+        "nwr[\"foo\"~\"bar\"](bbox);"+
       ");"
     );
     // but also escape special characters
     checkWizard(
       "foo:'*'",
       "("+
-        "node[\"foo\"~\"\\\\*\"](bbox);"+
-        "way[\"foo\"~\"\\\\*\"](bbox);"+
-        "relation[\"foo\"~\"\\\\*\"](bbox);"+
+        "nwr[\"foo\"~\"\\\\*\"](bbox);"+
       ");"
     );
   });
@@ -187,9 +161,7 @@ describe("data types", function () {
       checkWizard(
         '"a key"="a value"',
         '('+
-          'node["a key"="a value"](bbox);'+
-          'way["a key"="a value"](bbox);'+
-          'relation["a key"="a value"](bbox);'+
+          'nwr["a key"="a value"](bbox);'+
         ');'
       );
     });
@@ -198,9 +170,7 @@ describe("data types", function () {
       checkWizard(
         "'foo bar'='asd fasd'",
         '('+
-          'node["foo bar"="asd fasd"](bbox);'+
-          'way["foo bar"="asd fasd"](bbox);'+
-          'relation["foo bar"="asd fasd"](bbox);'+
+          'nwr["foo bar"="asd fasd"](bbox);'+
         ');'
       );
     });
@@ -208,9 +178,7 @@ describe("data types", function () {
       checkWizard(
         "name='بیجنگ'",
         '('+
-          'node["name"="بیجنگ"](bbox);'+
-          'way["name"="بیجنگ"](bbox);'+
-          'relation["name"="بیجنگ"](bbox);'+
+          'nwr["name"="بیجنگ"](bbox);'+
         ');'
       );
     });
@@ -218,9 +186,7 @@ describe("data types", function () {
       checkWizard(
         "name=Béziers",
         '('+
-          'node["name"="Béziers"](bbox);'+
-          'way["name"="Béziers"](bbox);'+
-          'relation["name"="Béziers"](bbox);'+
+          'nwr["name"="Béziers"](bbox);'+
         ');'
       );
     });
@@ -231,18 +197,14 @@ describe("data types", function () {
     checkWizard(
       "foo~/bar/",
       "("+
-        "node[\"foo\"~\"bar\"](bbox);"+
-        "way[\"foo\"~\"bar\"](bbox);"+
-        "relation[\"foo\"~\"bar\"](bbox);"+
+        "nwr[\"foo\"~\"bar\"](bbox);"+
       ");"
     );
     // simple regex with modifier
     checkWizard(
       "foo~/bar/i",
       "("+
-        "node[\"foo\"~\"bar\",i](bbox);"+
-        "way[\"foo\"~\"bar\",i](bbox);"+
-        "relation[\"foo\"~\"bar\",i](bbox);"+
+        "nwr[\"foo\"~\"bar\",i](bbox);"+
       ");"
     );
   });
@@ -259,9 +221,7 @@ describe("boolean logic", function () {
         "foo=bar && asd=fasd",
       ],
       "("+
-        "node[\"foo\"=\"bar\"][\"asd\"=\"fasd\"](bbox);"+
-        "way[\"foo\"=\"bar\"][\"asd\"=\"fasd\"](bbox);"+
-        "relation[\"foo\"=\"bar\"][\"asd\"=\"fasd\"](bbox);"+
+        "nwr[\"foo\"=\"bar\"][\"asd\"=\"fasd\"](bbox);"+
       ");"
     );
   });
@@ -274,12 +234,8 @@ describe("boolean logic", function () {
         "foo=bar || asd=fasd"
       ],
       '('+
-        'node["foo"="bar"](bbox);'+
-        'way["foo"="bar"](bbox);'+
-        'relation["foo"="bar"](bbox);'+
-        'node["asd"="fasd"](bbox);'+
-        'way["asd"="fasd"](bbox);'+
-        'relation["asd"="fasd"](bbox);'+
+        'nwr["foo"="bar"](bbox);'+
+        'nwr["asd"="fasd"](bbox);'+
       ');'
     );
   });
@@ -288,18 +244,10 @@ describe("boolean logic", function () {
     checkWizard(
       "(foo=* or bar=*) and (asd=* or fasd=*)",
       "("+
-        "node[\"foo\"][\"asd\"](bbox);"+
-        "way[\"foo\"][\"asd\"](bbox);"+
-        "relation[\"foo\"][\"asd\"](bbox);"+
-        "node[\"foo\"][\"fasd\"](bbox);"+
-        "way[\"foo\"][\"fasd\"](bbox);"+
-        "relation[\"foo\"][\"fasd\"](bbox);"+
-        "node[\"bar\"][\"asd\"](bbox);"+
-        "way[\"bar\"][\"asd\"](bbox);"+
-        "relation[\"bar\"][\"asd\"](bbox);"+
-        "node[\"bar\"][\"fasd\"](bbox);"+
-        "way[\"bar\"][\"fasd\"](bbox);"+
-        "relation[\"bar\"][\"fasd\"](bbox);"+
+        "nwr[\"foo\"][\"asd\"](bbox);"+
+        "nwr[\"foo\"][\"fasd\"](bbox);"+
+        "nwr[\"bar\"][\"asd\"](bbox);"+
+        "nwr[\"bar\"][\"fasd\"](bbox);"+
       ");"
     );
   });
@@ -378,9 +326,7 @@ describe("meta conditions", function () {
     checkWizard(
       "id:123",
       "("+
-        "node(123)(bbox);"+
-        "way(123)(bbox);"+
-        "relation(123)(bbox);"+
+        "nwr(123)(bbox);"+
       ");"
     );
   });
@@ -498,9 +444,7 @@ describe("free form", function () {
     expect(result).to.not.equal(false);
     expect(compact(result)).to.equal(
       "("+
-        "node[\"amenity\"=\"hospital\"](bbox);"+
-        "way[\"amenity\"=\"hospital\"](bbox);"+
-        "relation[\"amenity\"=\"hospital\"](bbox);"+
+        "nwr[\"amenity\"=\"hospital\"](bbox);"+
       ");"+
       out_str
     );
