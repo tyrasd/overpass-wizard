@@ -1,5 +1,5 @@
 var expect = require("expect.js"),
-    wizard = require("../.");
+    wizard = require("../bundle.umd.js");
 
 function compact(q) {
   q = q.replace(/\/\*[\s\S]*?\*\//g,"");

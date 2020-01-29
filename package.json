@@ -2,11 +2,13 @@
   "name": "overpass-wizard",
   "version": "0.0.9",
   "description": "Human friendly way to generate Overpass API queries",
-  "main": "index.js",
+  "main": "bundle.umd.js",
   "scripts": {
-    "build": "pegjs -O size < wizard.pegjs > parser.js",
-    "pretest": "npm ls --depth=Infinity > /dev/null",
-    "test": "npm run test-lib",
+    "build": "npm run build:pegjs && npm run build:rollup && npm run build:rollup:min",
+    "build:pegjs": "pegjs --format es --optimize size < wizard.pegjs > parser.js",
+    "build:rollup": "rollup --config",
+    "build:rollup:min": "rollup --config --environment NODE_ENV:production",
+    "test": "npm run build && npm run test-lib",
     "test-lib": "mocha -R spec"
   },
   "bin": {
@@ -36,7 +38,9 @@
   "devDependencies": {
     "expect.js": "^0.3.1",
     "mocha": "^7.0.1",
-    "pegjs": "^0.10.0"
+    "pegjs": "pegjs/pegjs#6939d1eb8d4b36df9be08696b75d2ca526845794",
+    "rollup": "^1.30.1",
+    "rollup-plugin-terser": "^5.2.0"
   },
   "browser": {
     "request-promise": false
