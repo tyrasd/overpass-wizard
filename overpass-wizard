@@ -24,7 +24,7 @@ var argv = require('yargs')
     fs = require('fs'),
     concat = require('concat-stream'),
     expand = require('./expand'),
-    wizard = require('./');
+    wizard = require('./bundle.umd');
 
 if (argv.version) {
     return process.stdout.write(require('./package.json').version+'\n');

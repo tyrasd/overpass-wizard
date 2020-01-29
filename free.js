@@ -1,5 +1,5 @@
   // ffs/wizard module
-module.exports = function(presets) {
+export function free(presets) {
   var freeFormQuery = {};
   if (!presets) presets = {};
 

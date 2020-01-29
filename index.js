@@ -1,4 +1,5 @@
-var parser = require("./parser.js");
+import {parse} from "./parser.js";
+import {free} from "./free.js";
 var freeFormQuery; // todo: refactor this!
 
 // todo: normalization -> node module?
@@ -44,7 +45,7 @@ function normalize(query) {
   return normalized_query;
 }
 
-module.exports = function wizard(search, options) {
+export default function wizard(search, options) {
   var defaults = {
     comment: true,
     outputMode: "geom", // "recursive", "recursive_meta", out <*> ("geom", "ids", …)
@@ -71,9 +72,9 @@ module.exports = function wizard(search, options) {
   var parsedQuery;
 
   try {
-    parsedQuery = parser.parse(search);
+    parsedQuery = parse(search);
   } catch(e) {
-    console.error("couldn't parse wizard input");
+    console.error("couldn't parse wizard input", e);
     return false;
   }
 
@@ -291,7 +292,7 @@ module.exports = function wizard(search, options) {
       // todo: looks like some code duplication here could be reduced by refactoring
       if (cond_query.query === "free form") {
         // eventually load free form query module
-        if (!freeFormQuery) freeFormQuery = require('./free')(options.freeFormPresets);
+        if (!freeFormQuery) freeFormQuery = free(options.freeFormPresets);
         var ffs_clause = freeFormQuery.get_query_clause(cond_query);
         if (ffs_clause === false) {
           console.error("Couldn't find preset for free form input: "+cond_query.free)
