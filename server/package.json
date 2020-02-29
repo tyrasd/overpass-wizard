@@ -1,0 +1,8 @@
+{
+  "name": "overpass-wizard-server",
+  "private": true,
+  "description": "HTTP server for overpass-wizard",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
