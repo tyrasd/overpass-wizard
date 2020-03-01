@@ -22,7 +22,12 @@ app.get('/wizard', function(req, res) {
   // run overpass-wizard and send results
   var result = wizard(req.query.search, req.query);
   res.set('Content-Type', 'text/plain');
-  res.send(result);
+  if (result === false) {
+    res.status(400);
+    res.send('couldn\'t parse wizard input');
+  } else {
+    res.send(result);
+  }
 });
 
 var port = process.env.PORT || 3000;
