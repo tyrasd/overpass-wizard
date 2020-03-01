@@ -1,10 +1,15 @@
 var process = require('process');
 var express = require('express');
 var wizard = require('../index');
+var package = require('../package.json');
 
 var app = express();
 
-app.get('/overpass-wizard', function(req, res) {
+app.get('/wizard/version', function(req, res) {
+  res.set('Content-Type', 'text/plain');
+  res.send(package.version);
+});
+app.get('/wizard', function(req, res) {
   // parse boolean values
   Object.keys(req.query).forEach(function(key) {
     if (req.query[key] === 'false') {
@@ -16,7 +21,7 @@ app.get('/overpass-wizard', function(req, res) {
 
   // run overpass-wizard and send results
   var result = wizard(req.query.search, req.query);
-  res.set('Content-Type', 'text/plain')
+  res.set('Content-Type', 'text/plain');
   res.send(result);
 });
 

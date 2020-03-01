@@ -4,13 +4,13 @@ Provides the overpass-wizard via HTTP using Node.js and [express](https://expres
 
 ## Deployment
 
-1. cd `overpass-wizard/` && npm install
-2. cd `overpass-wizard/server/` && npm install
+1. `cd overpass-wizard/ && npm install`
+2. `cd overpass-wizard/server/ && npm install`
 3. `PORT=3000 node server.js`
 
 ## API
 
-### `/overpass-wizard?search=`
+### `/wizard?search=`
 
 Parameters:
 
@@ -35,3 +35,9 @@ Connection: keep-alive
 );
 out geom;
 ```
+
+### `/wizard/version`
+
+Returs the version of the overpass-wizard running on this server.
+
+
