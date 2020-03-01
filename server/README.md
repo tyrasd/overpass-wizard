@@ -20,7 +20,7 @@ Parameters:
 Example:
 
 ```
-curl --include 'localhost:3000/overpass-wizard?search=amenity=drinking_water&comment=false'
+$ curl --include 'localhost:3000/wizard?search=amenity=drinking_water&comment=false'
 HTTP/1.1 200 OK
 X-Powered-By: Express
 Content-Type: text/plain; charset=utf-8
@@ -38,6 +38,17 @@ out geom;
 
 ### `/wizard/version`
 
-Returs the version of the overpass-wizard running on this server.
+Returns the version of the overpass-wizard running on this server.
 
+```
+$ curl --include 'localhost:3000/wizard/version'
+HTTP/1.1 200 OK
+X-Powered-By: Express
+Content-Type: text/plain; charset=utf-8
+Content-Length: 5
+ETag: W/"5-dybzI3dlhHv5waY82EPp7XlKfgQ"
+Date: Sun, 01 Mar 2020 20:26:44 GMT
+Connection: keep-alive
 
+0.0.9
+```
