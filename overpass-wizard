@@ -8,6 +8,7 @@ var argv = require('yargs')
         .boolean('no-compact').describe('no-compact','don\'t use the compact "nwr" syntax (for use with older Overpass-API servers)')
         .string('bbox').alias('b', 'bbox').describe('bbox','string to replace {{bbox}} shortcuts with')
         .string('around-radius').describe('around-radius','radius to use for "around <location>" queries')
+        .string('presetsFile').describe('presetsFile','(experimental) path to a JSON file with iD editor schema presets. Used to expand free form search input (e.g. Hotel in Vienna).')
 
         .string('timeout').alias('t', 'timeout').default('timeout', 25).describe('timeout','timeout of overpass query in seconds')
         .string('maxsize').describe('maxsize','memory limit of overpass query (in bytes)')
